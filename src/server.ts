@@ -3,6 +3,18 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
+const SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://fashionlovabety.store/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://fashionlovabety.store/collections/robes</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://fashionlovabety.store/collections/tops</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://fashionlovabety.store/collections/ensembles</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://fashionlovabety.store/collections/pantalons</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://fashionlovabety.store/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+</urlset>`;
+
+const ROBOTS = `User-agent: *\nAllow: /\n\nSitemap: https://fashionlovabety.store/sitemap.xml`;
+
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
@@ -39,6 +51,12 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const { pathname } = new URL(request.url);
+    if (pathname === "/sitemap.xml")
+      return new Response(SITEMAP, { headers: { "Content-Type": "application/xml; charset=utf-8" } });
+    if (pathname === "/robots.txt")
+      return new Response(ROBOTS, { headers: { "Content-Type": "text/plain; charset=utf-8" } });
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
