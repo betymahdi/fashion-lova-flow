@@ -56,12 +56,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Fashion Lova Bety — Mode féminine tendance au Maroc" },
-      { name: "description", content: "Boutique de mode féminine en polyamide premium. Livraison partout au Maroc, paiement à la livraison." },
-      { property: "og:title", content: "Fashion Lova Bety" },
-      { property: "og:description", content: "Mode féminine tendance • Livraison partout au Maroc" },
+      { title: "Fashion Lova Bety — Boutique Mode Féminine en Ligne au Maroc" },
+      { name: "description", content: "Boutique de mode féminine en ligne au Maroc. Robes, tops, ensembles tendance. Livraison rapide partout au Maroc, paiement à la livraison." },
+      { name: "keywords", content: "mode féminine Maroc, boutique en ligne Maroc, vêtements femme Maroc, robe femme Maroc, fashion Maroc, tenue femme, mode tendance Maroc, livraison Maroc" },
+      { name: "robots", content: "index, follow" },
+      { name: "google-site-verification", content: "Se2SX_HfQw1BjrSArLMBKuu-e8HBF3o8GBepDw-SJM4" },
+      { name: "language", content: "fr" },
+      { property: "og:title", content: "Fashion Lova Bety — Mode Féminine au Maroc" },
+      { property: "og:description", content: "Boutique mode féminine en ligne • Livraison rapide partout au Maroc • Paiement à la livraison" },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "/favicon.png" },
+      { property: "og:url", content: "https://fashionlovabety.store" },
+      { property: "og:image", content: "https://fashionlovabety.store/favicon.png" },
+      { property: "og:locale", content: "fr_MA" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Fashion Lova Bety — Mode Féminine au Maroc" },
+      { name: "twitter:description", content: "Boutique mode féminine en ligne • Livraison partout au Maroc" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -78,10 +87,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="fr">
-      <head><HeadContent /></head>
+      <head>
+        <HeadContent />
+        {GA_ID && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`,
+              }}
+            />
+          </>
+        )}
+      </head>
       <body>
         {children}
         <Scripts />

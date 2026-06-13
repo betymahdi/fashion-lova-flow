@@ -18,8 +18,8 @@ const PINK_MID   = "#fce4ec";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Fashion Lova Bety — Vêtements féminins élégants" },
-      { name: "description", content: "Mode féminine élégante — Livraison partout au Maroc." },
+      { title: "Fashion Lova Bety — Vêtements Femme Tendance | Boutique en Ligne Maroc" },
+      { name: "description", content: "Découvrez notre collection de vêtements femme tendance : robes, tops, ensembles. Livraison rapide partout au Maroc, paiement à la livraison. Qualité premium garantie." },
     ],
   }),
   component: HomePage,

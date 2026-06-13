@@ -18,7 +18,31 @@ const GOLD = "#C9A96E";
 const PINK = "#F9C6D0";
 
 export const Route = createFileRoute("/product/$id")({
-  head: () => ({ meta: [{ title: "Produit — Fashion Lova Bety" }] }),
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: loaderData?.name
+          ? `${loaderData.name} — Fashion Lova Bety`
+          : "Produit — Fashion Lova Bety",
+      },
+      {
+        name: "description",
+        content: loaderData?.description
+          ? `${loaderData.description.slice(0, 150)} — Livraison partout au Maroc.`
+          : "Vêtement féminin tendance — Livraison partout au Maroc, paiement à la livraison.",
+      },
+    ],
+  }),
+  loader: async ({ params }): Promise<{ name: string; description: string | null } | null> => {
+    const { data } = await supabase
+      .from("products")
+      .select("name, description")
+      .eq("id", params.id)
+      .eq("is_active", true)
+      .maybeSingle();
+    if (!data) return null;
+    return { name: (data as any).name ?? "", description: (data as any).description ?? null };
+  },
   component: ProductPage,
 });
 
@@ -128,7 +152,7 @@ function ProductPage() {
                       key={i}
                       onClick={() => setImgIdx(i)}
                       className="h-20 w-20 flex-none overflow-hidden rounded-2xl ring-2 transition"
-                      style={{ ringColor: i === imgIdx ? GOLD : "transparent", opacity: i === imgIdx ? 1 : 0.6 }}
+                      style={{ outline: i === imgIdx ? `2px solid ${GOLD}` : "2px solid transparent", opacity: i === imgIdx ? 1 : 0.6 }}
                     >
                       <img src={src} alt="" className="h-full w-full object-cover" />
                     </button>
