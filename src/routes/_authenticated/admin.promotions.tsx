@@ -378,7 +378,7 @@ function PacksTab() {
                   <td className="px-4 py-3 font-medium">{row.name}</td>
                   <td className="px-4 py-3">{row.min_items} articles</td>
                   <td className="px-4 py-3">
-                    {row.discount_type === "percentage" ? `${row.discount_value}%` : `${row.discount_value} DH`}
+                    {row.discount_type === "percentage" ? `${row.discount_value}%` : row.discount_type === "fixed_price" ? `Prix fixe ${row.discount_value} DH` : `-${row.discount_value} DH`}
                   </td>
                   <td className="px-4 py-3 text-xs text-muted-foreground">{packSummary(row)}</td>
                   <td className="px-4 py-3"><Badge active={row.is_active} /></td>
@@ -454,12 +454,15 @@ function PackForm({ initial, products, onClose, onSubmit, onChange }: {
             <label className="flex flex-col gap-1 text-sm">
               <span className="font-medium">Type remise</span>
               <select className={cls} value={f.discount_type ?? "percentage"} onChange={(e) => set({ discount_type: e.target.value })}>
-                <option value="percentage">%</option>
-                <option value="fixed">Fixe DH</option>
+                <option value="percentage">% remise</option>
+                <option value="fixed">- Montant fixe DH</option>
+                <option value="fixed_price">Prix total fixe DH</option>
               </select>
             </label>
             <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Valeur</span>
+              <span className="font-medium">
+                {f.discount_type === "fixed_price" ? "Prix total (DH)" : f.discount_type === "percentage" ? "Pourcentage (%)" : "Montant remise (DH)"}
+              </span>
               <input required type="number" min={0} className={cls} value={f.discount_value ?? ""} onChange={(e) => set({ discount_value: Number(e.target.value) })} />
             </label>
           </div>

@@ -48,6 +48,8 @@ export function usePackDiscount(items: CartItem[], subtotal: number): PackDiscou
       const discount =
         pack.discount_type === "percentage"
           ? Math.round((subtotal * pack.discount_value) / 100)
+          : pack.discount_type === "fixed_price"
+          ? Math.max(0, subtotal - pack.discount_value)
           : pack.discount_value;
 
       if (discount > bestDiscount) {

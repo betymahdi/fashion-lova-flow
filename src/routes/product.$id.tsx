@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ChevronLeft, Minus, Plus, Check, Tag, Sparkles } from "lucide-react";
+import { ChevronLeft, Minus, Plus, Check, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -213,6 +213,8 @@ function ProductPage() {
                     const discountLabel =
                       pack.discount_type === "percentage"
                         ? `-${pack.discount_value}%`
+                        : pack.discount_type === "fixed_price"
+                        ? `${pack.discount_value} DH seulement`
                         : `-${pack.discount_value} DH`;
                     return (
                       <div
