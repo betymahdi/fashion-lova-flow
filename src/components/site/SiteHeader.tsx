@@ -59,7 +59,7 @@ export function SiteHeader() {
             alt={BRAND.name}
             loading="eager"
             decoding="async"
-            className="h-10 w-10 rounded-xl border-2 bg-white object-contain p-1 shadow-sm"
+            className="h-14 w-14 rounded-xl border-2 bg-white object-contain p-1 shadow-sm"
             style={{ borderColor: GOLD }}
           />
           <span className="hidden font-display text-base leading-none sm:block" style={{ color: "#2C2C2A" }}>
