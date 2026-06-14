@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ChevronLeft, Minus, Plus, Check, Tag } from "lucide-react";
+import { ChevronLeft, Minus, Plus, Check, Tag, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -78,6 +78,25 @@ function ProductPage() {
   }, [items, p, qty]);
   const simulatedSubtotal = simulatedItems.reduce((s, it) => s + it.quantity * it.price, 0);
   const { pack: previewPack, discount: previewDiscount } = usePackDiscount(simulatedItems, simulatedSubtotal);
+
+  // Packs applicables à ce produit (pour affichage offre même si panier vide)
+  const { data: applicablePacks } = useQuery({
+    queryKey: ["applicable-packs", id],
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_packs")
+        .select("*")
+        .eq("is_active", true);
+      if (error || !data) return [];
+      return data.filter((pack) => {
+        const ids = pack.product_ids as string[] | null;
+        return !ids || ids.length === 0 || ids.includes(id);
+      });
+    },
+  });
 
   if (!isLoading && !p) throw notFound();
   if (error) throw error;
@@ -186,22 +205,39 @@ function ProductPage() {
                 </p>
               )}
 
-              {/* Pack discount preview */}
-              {previewPack && previewDiscount > 0 && (
-                <div
-                  className="flex items-start gap-3 rounded-2xl p-4 text-sm"
-                  style={{ background: `${GOLD}12`, border: `1px solid ${GOLD}40` }}
-                >
-                  <Tag className="mt-0.5 h-4 w-4 shrink-0" style={{ color: GOLD }} />
-                  <div>
-                    <span className="font-semibold" style={{ color: GOLD }}>
-                      Pack disponible : {previewPack.name}
-                    </span>
-                    <p className="mt-0.5 text-gray-500">
-                      Ajoutez cet article à votre panier pour bénéficier de{" "}
-                      <strong style={{ color: GOLD }}>-{previewDiscount} DH</strong> de réduction automatique.
-                    </p>
-                  </div>
+              {/* Offres packs applicables à ce produit */}
+              {applicablePacks && applicablePacks.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {applicablePacks.map((pack) => {
+                    const isActive = previewPack?.id === pack.id && previewDiscount > 0;
+                    const discountLabel =
+                      pack.discount_type === "percentage"
+                        ? `-${pack.discount_value}%`
+                        : `-${pack.discount_value} DH`;
+                    return (
+                      <div
+                        key={pack.id}
+                        className="flex items-start gap-3 rounded-2xl p-4 text-sm"
+                        style={{
+                          background: isActive ? `${GOLD}20` : `${GOLD}0D`,
+                          border: `1px solid ${isActive ? GOLD : GOLD + "50"}`,
+                        }}
+                      >
+                        <Sparkles className="mt-0.5 h-4 w-4 shrink-0" style={{ color: GOLD }} />
+                        <div>
+                          <span className="font-semibold" style={{ color: GOLD }}>
+                            {pack.name} — {discountLabel}
+                          </span>
+                          <p className="mt-0.5 text-gray-500">
+                            {isActive
+                              ? <><strong style={{ color: GOLD }}>Réduction activée !</strong> Votre panier bénéficie déjà de cette offre.</>
+                              : `Achetez ${pack.min_items} article${pack.min_items > 1 ? "s" : ""} ou plus et économisez ${discountLabel} automatiquement.`
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
